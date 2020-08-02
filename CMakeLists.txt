@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.8)
+project(xwindow)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_STANDARD 11)
+
+add_executable(xcb_client xcb_client.cpp)
+target_link_libraries(xcb_client xcb)
+
+add_executable(wayland_compositor wayland_compositor.c)
+target_link_libraries(wayland_compositor wayland-server pixman-1)
+target_link_options(wayland_compositor PUBLIC -L${CMAKE_SOURCE_DIR}/wlroots/build/libwlroots.so)
+target_include_directories(wayland_compositor PUBLIC /usr/include/pixman-1)
+target_compile_definitions(wayland_compositor PUBLIC -DWLR_USE_UNSTABLE=1)
+
+add_definitions(-DGNU_SOURCE)
+add_executable(tinywl tinywl.c xdg-shell-protocol.c)
+target_link_libraries(tinywl wayland-server xkbcommon)
+target_link_options(tinywl PUBLIC ${CMAKE_SOURCE_DIR}/wlroots/build/libwlroots.so -Wl,-rpath=${CMAKE_SOURCE_DIR}/wlroots/build)
+target_include_directories(wayland_compositor PUBLIC /usr/include/pixman-1)
+target_include_directories(tinywl PUBLIC .)
+target_include_directories(tinywl PUBLIC /usr/include/pixman-1)
+target_compile_definitions(tinywl PUBLIC -DWLR_USE_UNSTABLE)
